@@ -4,6 +4,7 @@
 #include<algorithm>
 #define inf ((DataType)(1e9))
 #define exp 17
+#define VAL_NUM 2
 #define fastio() ios::sync_with_stdio(0);cin.tie(0);cout.tie(0)
 
 using namespace std;
@@ -13,13 +14,13 @@ using pid=pair<int,DataType>;
 
 struct Node{
 	int p[exp];
-	DataType m[exp],M[exp];
+	DataType val[exp][VAL_NUM];
 	int visit,depth;
 	vector<pid> v;
 };
 
 struct Query{
-	DataType m,M;
+	DataType val[VAL_NUM];
 };
 
 Node arr[100010];
@@ -40,19 +41,19 @@ DataType (*metric[])(DataType s,DataType e){
 void lcainit(int p,int idx,DataType val){
 	arr[idx].visit=1;
 	for(int i=0;i<exp;++i){
-		arr[idx].m[i]=inf;
-		arr[idx].M[i]=-inf;
+		arr[idx].val[i][0]=inf;
+		arr[idx].val[i][1]=-inf;
 	}
 	arr[idx].p[0]=p;
-	arr[idx].m[0]=arr[idx].M[0]=val;
+	arr[idx].val[0][0]=arr[idx].val[0][1]=val;
 }
 
 void dfs(int p,int idx,DataType val){
 	lcainit(p,idx,val);
 	for(int i=1;i<exp;++i){
 		arr[idx].p[i]=arr[arr[idx].p[i-1]].p[i-1];
-		arr[idx].m[i]=metric[0](arr[idx].m[i-1],arr[arr[idx].p[i-1]].m[i-1]);
-		arr[idx].M[i]=metric[1](arr[idx].M[i-1],arr[arr[idx].p[i-1]].M[i-1]);
+		for(int j=0;j<VAL_NUM;++j)
+			arr[idx].val[i][j]=metric[j](arr[idx].val[i-1][j],arr[arr[idx].p[i-1]].val[i-1][j]);
 	}
 	arr[idx].depth=arr[arr[idx].p[0]].depth+1;
 	for(auto i:arr[idx].v){
@@ -62,10 +63,10 @@ void dfs(int p,int idx,DataType val){
 }
 
 void update(int a,int b,int idx,Query& q){
-	q.m=metric[0](q.m,arr[a].m[idx]);
-	q.m=metric[0](q.m,arr[b].m[idx]);
-	q.M=metric[1](q.M,arr[a].M[idx]);
-	q.M=metric[1](q.M,arr[b].M[idx]);
+	for(int i=0;i<VAL_NUM;++i){
+		q.val[i]=metric[i](q.val[i],arr[a].val[idx][i]);
+		q.val[i]=metric[i](q.val[i],arr[b].val[idx][i]);
+	}
 }
 
 Query lca(int a,int b,Query q){
@@ -85,8 +86,8 @@ Query level(int& a,int& b){
 	Query ret={inf,-inf};
 	for(int i=exp-1;i>=0;--i){
 		if(arr[a].depth-(1<<i)>=arr[b].depth){
-			ret.m=metric[0](ret.m,arr[a].m[i]);
-			ret.M=metric[1](ret.M,arr[a].M[i]);
+			for(int j=0;j<VAL_NUM;++j)
+				ret.val[j]=metric[j](ret.val[j],arr[a].val[i][j]);
 			a=arr[a].p[i];
 		}
 	}
@@ -114,6 +115,6 @@ int main(){
 		if(arr[b].depth>arr[a].depth)swap(a,b);
 		Query ret=level(a,b);
 		ret=lca(a,b,ret);
-		cout<<ret.m<<' '<<ret.M<<'\n';
+		cout<<ret.val[0]<<' '<<ret.val[1]<<'\n';
 	}
 }
