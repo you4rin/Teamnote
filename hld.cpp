@@ -7,7 +7,8 @@
 #define left seg[pos*2]
 #define right seg[pos*2+1]
 #define N (1<<18)
-#define initval 1 // may be fixed
+#define INIT_VAL 1 // may be fixed
+#define VAL_NUM 1
 
 using namespace std;
 using ll=long long;
@@ -21,12 +22,16 @@ struct Node{
 
 struct Edge{
 	int s,e;
-	DataType val;
+	DataType val[VAL_NUM];
 };
 
 struct Seg{
 	int s,e;
-	DataType val;
+	DataType val[VAL_NUM];
+};
+
+struct Query{
+	DataType val[VAL_NUM];
 };
 
 Node arr[N];
@@ -76,28 +81,34 @@ void dfs2(int idx){
 	}
 }
 
-void update(int pos,int idx,DataType val){
+void update(int pos,int idx,Query val){
 	if(cur.s>idx||idx>cur.e)return;
 	if(seg[pos].s==seg[pos].e){
-		seg[pos].val=val;
+		for(int i=0;i<VAL_NUM;++i)seg[pos].val[i]=val.val[i];
 		return;
 	}
 	update(pos*2,idx,val);
 	update(pos*2+1,idx,val);
-	cur.val=metric[0](left.val,right.val);
+	for(int i=0;i<VAL_NUM;++i)cur.val[i]=metric[i](left.val[i],right.val[i]);
 }
 
-DataType query(int pos,int s,int e){
-	if(cur.s>e||s>cur.e||s>e)return initval;
-	if(cur.s>=s&&e>=cur.e)return cur.val;
-	return metric[0](query(pos*2,s,e),query(pos*2+1,s,e));
+Query query(int pos,int s,int e){
+	Query ret={INIT_VAL},l,r;
+	if(cur.s>e||s>cur.e||s>e)return ret;
+	if(cur.s>=s&&e>=cur.e){
+		for(int i=0;i<VAL_NUM;++i)ret.val[i]=cur.val[i];
+		return ret;
+	}
+	l=query(pos*2,s,e),r=query(pos*2+1,s,e);
+	for(int i=0;i<VAL_NUM;++i)ret.val[i]=metric[i](l.val[i],r.val[i]);
+	return ret;
 }
 
 void init(){
 	// seginit
 	for(int pos=N;pos<2*N;++pos)cur.s=cur.e=pos-N+1; // 1-based index
 	for(int pos=N-1;pos;--pos)cur.s=left.s,cur.e=right.e;
-	for(int pos=1;pos<2*N;++pos)cur.val=initval;
+	for(int pos=1;pos<2*N;++pos)for(int i=0;i<VAL_NUM;++i)cur.val[i]=INIT_VAL;
 	// hldinit
 	arr[1].depth=arr[1].chain=1;
 	dfs1(1);dfs2(1);
@@ -109,15 +120,18 @@ void addEdge(int src,int dst){
 	arr[dst].v.push_back(src);
 }
 
-DataType eval(int s,int e){
-	DataType ret=1; // init value may be fixed
+Query eval(int s,int e){
+	Query ret={INIT_VAL},p; // init value may be fixed
 	while(arr[s].chain!=arr[e].chain){
 		if(arr[arr[s].chain].depth<arr[arr[e].chain].depth)swap(s,e);
-		ret=metric[0](ret,query(1,num[arr[s].chain],num[s]));
+		p=query(1,num[arr[s].chain],num[s]);
+		for(int i=0;i<VAL_NUM;++i)ret.val[i]=metric[i](ret.val[i],p.val[i]);
 		s=arr[arr[s].chain].p;
 	}
 	if(arr[s].depth<arr[e].depth)swap(s,e);
-	return metric[0](ret,query(1,num[e]+1,num[s]));
+	p=query(1,num[e]+1,num[s]);
+	for(int i=0;i<VAL_NUM;++i)ret.val[i]=metric[i](ret.val[i],p.val[i]);
+	return ret;
 }
 
 int main(){
@@ -132,9 +146,9 @@ int main(){
 	// may add preprocessing code of segtree here
 	for(;q--;){
 		cin>>a>>b>>c;
-		DataType ret=eval(a,b);
-		printf(ret?"YES\n":"NO\n");
-		if(c&&ret)update(1,num[a],0);
-		else if(c)update(1,num[b],0);
+		Query ret=eval(a,b);
+		printf(ret.val[0]?"YES\n":"NO\n");
+		if(c&&ret.val[0])update(1,num[a],{0});
+		else if(c)update(1,num[b],{0});
 	}
 }
