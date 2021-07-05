@@ -37,9 +37,13 @@ int inv[N]; // seg idx -> vertex idx
 vector<int> chain[N];
 Edge edge[N];
 
-DataType metric(DataType s,DataType e){
-	return s*e; // may be fixed
+DataType mul(DataType s,DataType e){
+	return s*e;
 }
+
+DataType (*metric[])(DataType s,DataType e){
+	mul, // may be added
+};
 
 int dfs1(int idx){
 	arr[idx].sz=1;
@@ -80,13 +84,13 @@ void update(int pos,int idx,DataType val){
 	}
 	update(pos*2,idx,val);
 	update(pos*2+1,idx,val);
-	cur.val=metric(left.val,right.val);
+	cur.val=metric[0](left.val,right.val);
 }
 
 DataType query(int pos,int s,int e){
 	if(cur.s>e||s>cur.e||s>e)return initval;
 	if(cur.s>=s&&e>=cur.e)return cur.val;
-	return metric(query(pos*2,s,e),query(pos*2+1,s,e));
+	return metric[0](query(pos*2,s,e),query(pos*2+1,s,e));
 }
 
 void init(){
@@ -109,11 +113,11 @@ DataType eval(int s,int e){
 	DataType ret=1; // init value may be fixed
 	while(arr[s].chain!=arr[e].chain){
 		if(arr[arr[s].chain].depth<arr[arr[e].chain].depth)swap(s,e);
-		ret=metric(ret,query(1,num[arr[s].chain],num[s]));
+		ret=metric[0](ret,query(1,num[arr[s].chain],num[s]));
 		s=arr[arr[s].chain].p;
 	}
 	if(arr[s].depth<arr[e].depth)swap(s,e);
-	return metric(ret,query(1,num[e]+1,num[s]));
+	return metric[0](ret,query(1,num[e]+1,num[s]));
 }
 
 int main(){
