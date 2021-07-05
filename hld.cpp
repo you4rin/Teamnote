@@ -2,6 +2,9 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>
+#pragma GCC optimize("Ofast") 
+#pragma GCC target("avx,avx2,fma") 
+#pragma GCC optimize ("unroll-loops")
 #define fastio() ios::sync_with_stdio(0);cin.tie(0);cout.tie(0)
 #define cur seg[pos]
 #define left seg[pos*2]
@@ -114,7 +117,7 @@ void init(){
 	dfs1(1);dfs2(1);
 }
 
-// add 'undirected' edge
+// add 'undirected', 'weighted' edge
 void addEdge(int src,int dst){
 	arr[src].v.push_back(dst);
 	arr[dst].v.push_back(src);
