@@ -1,6 +1,7 @@
 // boj.kr/13309
 #include<iostream>
 #include<vector>
+#include<functional>
 #include<algorithm>
 #pragma GCC optimize("Ofast") 
 #pragma GCC target("avx,avx2,fma") 
@@ -10,7 +11,6 @@
 #define left seg[pos*2]
 #define right seg[pos*2+1]
 #define N (1<<18)
-#define INIT_VAL 1 // may be fixed
 #define VAL_NUM 1
 
 using namespace std;
@@ -23,18 +23,18 @@ struct Node{
 	vector<int> v;
 };
 
+struct Value{
+	DataType data[VAL_NUM];
+};
+
 struct Edge{
 	int s,e;
-	DataType val[VAL_NUM];
+	Value val;
 };
 
 struct Seg{
 	int s,e;
-	DataType val[VAL_NUM];
-};
-
-struct Query{
-	DataType val[VAL_NUM];
+	Value val;
 };
 
 Node arr[N];
@@ -45,12 +45,9 @@ int inv[N]; // seg idx -> vertex idx
 vector<int> chain[N];
 Edge edge[N];
 
-DataType mul(DataType s,DataType e){
-	return s*e;
-}
-
-DataType (*metric[])(DataType s,DataType e){
-	mul, // may be added
+// caution that possibly ret==l || ret==r
+function<void(Value&,const Value&,const Value&)> op=[](Value& ret,const Value& l,const Value& r){
+	ret.data[0]=l.data[0]*r.data[0];
 };
 
 int dfs1(int idx){
@@ -84,26 +81,26 @@ void dfs2(int idx){
 	}
 }
 
-void update(int pos,int idx,Query val){
+void update(int pos,int idx,const Value& val){
 	if(cur.s>idx||idx>cur.e)return;
 	if(seg[pos].s==seg[pos].e){
-		for(int i=0;i<VAL_NUM;++i)seg[pos].val[i]=val.val[i];
+		for(int i=0;i<VAL_NUM;++i)seg[pos].val.data[i]=val.data[i];
 		return;
 	}
 	update(pos*2,idx,val);
 	update(pos*2+1,idx,val);
-	for(int i=0;i<VAL_NUM;++i)cur.val[i]=metric[i](left.val[i],right.val[i]);
+	op(cur.val,left.val,right.val);
 }
 
-Query query(int pos,int s,int e){
-	Query ret={INIT_VAL},l,r;
+Value query(int pos,int s,int e){
+	Value ret={1},l,r; // init value may be fixed
 	if(cur.s>e||s>cur.e||s>e)return ret;
 	if(cur.s>=s&&e>=cur.e){
-		for(int i=0;i<VAL_NUM;++i)ret.val[i]=cur.val[i];
+		for(int i=0;i<VAL_NUM;++i)ret.data[i]=cur.val.data[i];
 		return ret;
 	}
 	l=query(pos*2,s,e),r=query(pos*2+1,s,e);
-	for(int i=0;i<VAL_NUM;++i)ret.val[i]=metric[i](l.val[i],r.val[i]);
+	op(ret,l,r);
 	return ret;
 }
 
@@ -111,8 +108,8 @@ void init(){
 	// seginit
 	for(int pos=N;pos<2*N;++pos)cur.s=cur.e=pos-N+1; // 1-based index
 	for(int pos=N-1;pos;--pos)cur.s=left.s,cur.e=right.e;
-	for(int pos=1;pos<2*N;++pos)for(int i=0;i<VAL_NUM;++i)cur.val[i]=INIT_VAL;
-	// hldinit
+	for(int pos=1;pos<2*N;++pos)for(int i=0;i<VAL_NUM;++i)cur.val.data[i]=1; // may be removed
+																			 // hldinit
 	arr[1].depth=arr[1].chain=1;
 	dfs1(1);dfs2(1);
 }
@@ -123,17 +120,17 @@ void addEdge(int src,int dst){
 	arr[dst].v.push_back(src);
 }
 
-Query eval(int s,int e){
-	Query ret={INIT_VAL},p; // init value may be fixed
+Value eval(int s,int e){
+	Value ret={1},p; // init value may be fixed
 	while(arr[s].chain!=arr[e].chain){
 		if(arr[arr[s].chain].depth<arr[arr[e].chain].depth)swap(s,e);
 		p=query(1,num[arr[s].chain],num[s]);
-		for(int i=0;i<VAL_NUM;++i)ret.val[i]=metric[i](ret.val[i],p.val[i]);
+		op(ret,ret,p);
 		s=arr[arr[s].chain].p;
 	}
 	if(arr[s].depth<arr[e].depth)swap(s,e);
 	p=query(1,num[e]+1,num[s]);
-	for(int i=0;i<VAL_NUM;++i)ret.val[i]=metric[i](ret.val[i],p.val[i]);
+	op(ret,ret,p);
 	return ret;
 }
 
@@ -149,9 +146,9 @@ int main(){
 	// may add preprocessing code of segtree here
 	for(;q--;){
 		cin>>a>>b>>c;
-		Query ret=eval(a,b);
-		printf(ret.val[0]?"YES\n":"NO\n");
-		if(c&&ret.val[0])update(1,num[a],{0});
+		Value ret=eval(a,b);
+		printf(ret.data[0]?"YES\n":"NO\n");
+		if(c&&ret.data[0])update(1,num[a],{0});
 		else if(c)update(1,num[b],{0});
 	}
 }
