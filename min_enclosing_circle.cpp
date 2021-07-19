@@ -1,9 +1,11 @@
 // boj.kr/2626
-#include<cstdio>
+#include<iostream>
+#include<string>
 #include<cmath>
 #include<random>
 #include<vector>
 #include<algorithm>
+#define fastio() ios::sync_with_stdio(0);cin.tie(0);cout.tie(0)
 #define x first
 #define y second
 #define eps 1e-14
@@ -60,9 +62,10 @@ pair<pair<ld,ld>,ld> find1(int idx){
 }
 
 int main(){
-	scanf("%d",&n);
+	fastio();
+	cin>>n;
 	for(int i=0;i<n;++i){
-		scanf("%Lf %Lf",&p[i].x,&p[i].y);
+		cin>>p[i].x>>p[i].y;
 		for(int j=0;j<i;++j){
 			if(eps>(p[i].x-p[j].x)&&-eps<(p[i].x-p[j].x)&&eps>(p[i].y-p[j].y)&&-eps<(p[i].y-p[j].y)){
 				--i;--n;
@@ -72,14 +75,16 @@ int main(){
 	random_device rd;
 	mt19937 gen(rd());
 	shuffle(p,p+n,gen);
+	cout<<fixed;
+	cout.precision(3);
 	if(n==1){
-		printf("%.3Lf %.3Lf\n%.3Lf\n",p[0].x+eps,p[0].y+eps,(ld)0);
+		cout<<p[0].x+eps<<" "<<p[0].y+eps<<" "<<(ld)0<<"\n";
 		return 0;
 	}
 	c={{(p[0].x+p[1].x)/2,(p[0].y+p[1].y)/2},dist(p[0],p[1])/2};
 	if(c.y<eps&&c.y>-eps)c.y=abs(c.y);
 	if(n==2){
-		printf("%.3Lf %.3Lf\n%.3Lf\n",c.x.x+eps,c.x.y+eps,c.y);
+		cout<<c.x.x+eps<<" "<<c.x.y+eps<<" "<<c.y<<"\n";
 		return 0;
 	}
 	for(int i=2;i<n;++i){
@@ -87,5 +92,5 @@ int main(){
 		c=find1(i);
 	}
 	if(c.y<eps&&c.y>-eps)c.y=abs(c.y);
-	printf("%.3Lf %.3Lf\n%.3Lf\n",c.x.x+eps,c.x.y+eps,c.y);
+	cout<<c.x.x+eps<<" "<<c.x.y+eps<<" "<<c.y<<"\n";
 }
