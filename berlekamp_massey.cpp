@@ -1,3 +1,4 @@
+// code based on https://gist.github.com/koosaga/d4afc4434dbaa348d5bef0d60ac36aa4
 // boj.kr/13716
 #include<cstdio>
 #include<tuple>
