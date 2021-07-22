@@ -37,6 +37,8 @@ bool cross(line a,line b){
 	else if(a.p1.x==a.p2.x&&a.p1.y>a.p2.y)swap(a.p1,a.p2);
 	if(b.p1.x>b.p2.x)swap(b.p1,b.p2);
 	else if(b.p1.x==b.p2.x&&b.p1.y>b.p2.y)swap(b.p1,b.p2);
+	if(a.p1.x>b.p1.x)swap(a,b);
+	else if(a.p1.x==b.p1.x&&a.p1.y>b.p1.y)swap(a,b);
 	r1=ccw(a.p1,a.p2,b.p1),r2=ccw(a.p1,a.p2,b.p2);
 	if(r1==r2&&r1)return 0;
 	if(r1==r2&&!r1){
