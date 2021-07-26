@@ -12,7 +12,7 @@ using ld=long double;
 
 struct point{
 	ld x,y;
-	point(){}
+	point():x(0),y(0){}
 	point(ld x,ld y):x(x),y(y){}
 	point operator-(const point& other){return {x-other.x,y-other.y};}
 	bool operator<(const point& other){
