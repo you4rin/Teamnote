@@ -135,34 +135,34 @@ pii pathQuery(Node* x,Node* y){
 
 /*
 void query(Node* x,Node* y,int val){
-pii tmp=pathQuery(x,y);
-int m=tmp.first,idx=tmp.second;
-if(m<=val||!idx)return;
-int a=edge[idx].first,b=edge[idx].second;
-cur+=(ll)val-m;++cnt;
-if(getParent(&tree[n+idx])==&tree[a])cut(&tree[n+idx]);
-else cut(&tree[a]);
-if(getParent(&tree[n+idx])==&tree[b])cut(&tree[n+idx]);
-else cut(&tree[b]);
-tree[n+cnt]=Node(val,cnt);
-makeRoot(x);
-link(&tree[n+cnt],x);
-link(y,&tree[n+cnt]);
-edge[cnt]={y-&tree[0],x-&tree[0]};
+	pii tmp=pathQuery(x,y);
+	int m=tmp.first,idx=tmp.second;
+	if(m<=val||!idx)return;
+	int a=edge[idx].first,b=edge[idx].second;
+	cur+=(ll)val-m;++cnt;
+	if(getParent(&tree[n+idx])==&tree[a])cut(&tree[n+idx]);
+	else cut(&tree[a]);
+	if(getParent(&tree[n+idx])==&tree[b])cut(&tree[n+idx]);
+	else cut(&tree[b]);
+	tree[n+cnt]=Node(val,cnt);
+	makeRoot(x);
+	link(&tree[n+cnt],x);
+	link(y,&tree[n+cnt]);
+	edge[cnt]={y-&tree[0],x-&tree[0]};
 }
 */
 
 /*
 void dfs(int p,int idx){
-for(auto i:adj[idx]){
-if(i.first==p)continue;
-dfs(idx,i.first);
-++cnt;
-tree[n+cnt]=Node(i.second,cnt);
-link(&tree[n+cnt],&tree[i.first]);
-link(&tree[idx],&tree[n+cnt]);
-edge[cnt]={idx,i.first};
-}
+	for(auto i:adj[idx]){
+		if(i.first==p)continue;
+		dfs(idx,i.first);
+		++cnt;
+		tree[n+cnt]=Node(i.second,cnt);
+		link(&tree[n+cnt],&tree[i.first]);
+		link(&tree[idx],&tree[n+cnt]);
+		edge[cnt]={idx,i.first};
+	}
 }
 */
 
