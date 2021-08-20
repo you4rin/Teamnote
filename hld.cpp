@@ -23,18 +23,9 @@ struct Node{
 	vector<int> v;
 };
 
-struct Value{
-	DataType data[VAL_NUM];
-};
-
-struct Edge{
-	int s,e;
-	Value val;
-};
-
 struct Seg{
 	int s,e;
-	Value val;
+	DataType val;
 };
 
 Node arr[N];
@@ -43,12 +34,6 @@ int cnt;
 int num[N]; // vertex idx -> seg idx
 int inv[N]; // seg idx -> vertex idx
 vector<int> chain[N];
-Edge edge[N];
-
-// caution that possibly ret==l || ret==r
-function<void(Value&,const Value&,const Value&)> op=[](Value& ret,const Value& l,const Value& r){
-	ret.data[0]=l.data[0]*r.data[0];
-};
 
 int dfs1(int idx){
 	arr[idx].sz=1;
@@ -81,35 +66,35 @@ void dfs2(int idx){
 	}
 }
 
-void update(int pos,int idx,const Value& val){
+void update(int pos,int idx,DataType val){
 	if(cur.s>idx||idx>cur.e)return;
 	if(seg[pos].s==seg[pos].e){
-		for(int i=0;i<VAL_NUM;++i)seg[pos].val.data[i]=val.data[i];
+		for(int i=0;i<VAL_NUM;++i)cur.val=val;
 		return;
 	}
 	update(pos*2,idx,val);
 	update(pos*2+1,idx,val);
-	op(cur.val,left.val,right.val);
+	// operations
+	cur.val=left.val*right.val;
 }
 
-Value query(int pos,int s,int e){
-	Value ret={1},l,r; // init value may be fixed
+DataType query(int pos,int s,int e){
+	DataType ret=1,l,r; // init value may be fixed
 	if(cur.s>e||s>cur.e||s>e)return ret;
 	if(cur.s>=s&&e>=cur.e){
-		for(int i=0;i<VAL_NUM;++i)ret.data[i]=cur.val.data[i];
+		for(int i=0;i<VAL_NUM;++i)ret=cur.val;
 		return ret;
 	}
-	l=query(pos*2,s,e),r=query(pos*2+1,s,e);
-	op(ret,l,r);
-	return ret;
+	// operations
+	return query(pos*2,s,e)*query(pos*2+1,s,e);
 }
 
 void init(){
 	// seginit
 	for(int pos=N;pos<2*N;++pos)cur.s=cur.e=pos-N+1; // 1-based index
 	for(int pos=N-1;pos;--pos)cur.s=left.s,cur.e=right.e;
-	for(int pos=1;pos<2*N;++pos)for(int i=0;i<VAL_NUM;++i)cur.val.data[i]=1; // may be removed
-																			 // hldinit
+	for(int pos=1;pos<2*N;++pos)for(int i=0;i<VAL_NUM;++i)cur.val=1; // may be removed
+																	 // hldinit
 	arr[1].depth=arr[1].chain=1;
 	dfs1(1);dfs2(1);
 }
@@ -120,18 +105,16 @@ void addEdge(int src,int dst){
 	arr[dst].v.push_back(src);
 }
 
-Value eval(int s,int e){
-	Value ret={1},p; // init value may be fixed
+DataType eval(int s,int e){
+	DataType ret=1; // init value may be fixed
 	while(arr[s].chain!=arr[e].chain){
 		if(arr[arr[s].chain].depth<arr[arr[e].chain].depth)swap(s,e);
-		p=query(1,num[arr[s].chain],num[s]);
-		op(ret,ret,p);
+		ret*=query(1,num[arr[s].chain],num[s]);
 		s=arr[arr[s].chain].p;
 	}
 	if(arr[s].depth<arr[e].depth)swap(s,e);
-	p=query(1,num[e]+1,num[s]);
-	op(ret,ret,p);
-	return ret;
+	// operations
+	return ret*query(1,num[e]+1,num[s]);
 }
 
 int main(){
@@ -146,9 +129,9 @@ int main(){
 	// may add preprocessing code of segtree here
 	for(;q--;){
 		cin>>a>>b>>c;
-		Value ret=eval(a,b);
-		printf(ret.data[0]?"YES\n":"NO\n");
-		if(c&&ret.data[0])update(1,num[a],{0});
+		DataType ret=eval(a,b);
+		printf(ret?"YES\n":"NO\n");
+		if(c&&ret)update(1,num[a],{0});
 		else if(c)update(1,num[b],{0});
 	}
 }
