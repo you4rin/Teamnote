@@ -94,7 +94,7 @@ void init(){
 	for(int pos=N;pos<2*N;++pos)cur.s=cur.e=pos-N+1; // 1-based index
 	for(int pos=N-1;pos;--pos)cur.s=left.s,cur.e=right.e;
 	for(int pos=1;pos<2*N;++pos)for(int i=0;i<VAL_NUM;++i)cur.val=1; // may be removed
-																	 // hldinit
+	// hldinit
 	arr[1].depth=arr[1].chain=1;
 	dfs1(1);dfs2(1);
 }
