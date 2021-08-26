@@ -39,9 +39,9 @@ int main(){
 	l=1;r=0;
 	for(int i=0;i<q;++i){
 		while(query[i].l<l)f(--l,1);
+		while(query[i].r>r)f(++r,1);
 		while(query[i].l>l)f(l++,0);
 		while(query[i].r<r)f(r--,0);
-		while(query[i].r>r)f(++r,1);
 		ans[query[i].idx]=cur;
 	}
 	for(int i=0;i<q;++i)printf("%d\n",ans[i]);
