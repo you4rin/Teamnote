@@ -10,7 +10,7 @@ pll euc(ll a,ll b){
 	if(!b)return {1,0};
 	pll ret=euc(b,a%b);
 	ret={ret.second,ret.first-(a/b)*ret.second};
-	ll t=ret.first/b*b;
+	ll t=ret.first/b;
 	if(ret.first-b*t<0)--t;
 	return {ret.first-b*t,ret.second+a*t};
 }
