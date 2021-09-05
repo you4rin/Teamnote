@@ -6,16 +6,15 @@
 #define S 0
 #define T 301
 #define N 310
-#define inf ((DataType)(1e9))
+#define inf ((int)(1e9))
 #define fastio() ios::sync_with_stdio(0);cin.tie(0);cout.tie(0)
 
 using namespace std;
 using ll=long long;
-using DataType=int;
 
 struct Edge{
 	int dst;
-	DataType cap;
+	int cap;
 	int rev;
 };
 
@@ -41,7 +40,7 @@ bool bfs(){
 	return level[T]!=-1;
 }
 
-DataType dfs(int now,DataType flow){
+int dfs(int now,int flow){
 	if(now==T)return flow;
 	for(int& i=work[now];i<v[now].size();++i){
 		int next=v[now][i].dst;
@@ -58,17 +57,17 @@ DataType dfs(int now,DataType flow){
 }
 
 // add 'directed' edge
-void addEdge(int src,int dst,DataType cap){
+void addEdge(int src,int dst,int cap){
 	v[src].push_back({dst,cap,(int)v[dst].size()});
 	v[dst].push_back({src,0,(int)v[src].size()-1});
 }
 
 void solve(){
-	DataType ans=0;
+	int ans=0;
 	while(bfs()){
 		for(int i=S;i<=T;++i)work[i]=0;
 		while(1){
-			DataType ret=dfs(S,inf);
+			int ret=dfs(S,inf);
 			if(!ret)break;
 			ans+=ret;
 		}
@@ -79,7 +78,7 @@ void solve(){
 int main(){
 	fastio();
 	int n,m,s,e;
-	DataType val;
+	int val;
 	cin>>n>>m;
 	addEdge(S,1,inf);
 	addEdge(n,T,inf);

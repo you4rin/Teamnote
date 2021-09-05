@@ -7,10 +7,9 @@
 
 using namespace std;
 using ll=long long;
-using DataType=ll;
 
 struct point{
-	DataType x,y;
+	ll x,y;
 };
 
 struct line{
@@ -20,7 +19,7 @@ struct line{
 point src[2],dst[2];
 
 int ccw(point p1,point p2,point p3){
-	DataType x1,y1,x2,y2,det;
+	ll x1,y1,x2,y2,det;
 	x1=p2.x-p1.x;
 	y1=p2.y-p1.y;
 	x2=p3.x-p2.x;

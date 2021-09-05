@@ -16,7 +16,6 @@
 using namespace std;
 using ll=long long;
 using pii=pair<int,int>;
-using DataType=int;
 
 struct Node{
 	int sz,p,depth,chain;
@@ -25,7 +24,7 @@ struct Node{
 
 struct Seg{
 	int s,e;
-	DataType val;
+	int val;
 };
 
 Node arr[N];
@@ -66,7 +65,7 @@ void dfs2(int idx){
 	}
 }
 
-void update(int pos,int idx,DataType val){
+void update(int pos,int idx,int val){
 	if(cur.s>idx||idx>cur.e)return;
 	if(seg[pos].s==seg[pos].e){
 		for(int i=0;i<VAL_NUM;++i)cur.val=val;
@@ -78,8 +77,8 @@ void update(int pos,int idx,DataType val){
 	cur.val=left.val*right.val;
 }
 
-DataType query(int pos,int s,int e){
-	DataType ret=1,l,r; // init value may be fixed
+int query(int pos,int s,int e){
+	int ret=1,l,r; // init value may be fixed
 	if(cur.s>e||s>cur.e||s>e)return ret;
 	if(cur.s>=s&&e>=cur.e){
 		for(int i=0;i<VAL_NUM;++i)ret=cur.val;
@@ -105,8 +104,8 @@ void addEdge(int src,int dst){
 	arr[dst].v.push_back(src);
 }
 
-DataType eval(int s,int e){
-	DataType ret=1; // init value may be fixed
+int eval(int s,int e){
+	int ret=1; // init value may be fixed
 	while(arr[s].chain!=arr[e].chain){
 		if(arr[arr[s].chain].depth<arr[arr[e].chain].depth)swap(s,e);
 		ret*=query(1,num[arr[s].chain],num[s]);
@@ -129,7 +128,7 @@ int main(){
 	// may add preprocessing code of segtree here
 	for(;q--;){
 		cin>>a>>b>>c;
-		DataType ret=eval(a,b);
+		int ret=eval(a,b);
 		printf(ret?"YES\n":"NO\n");
 		if(c&&ret)update(1,num[a],{0});
 		else if(c)update(1,num[b],{0});

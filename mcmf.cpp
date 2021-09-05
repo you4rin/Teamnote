@@ -9,23 +9,22 @@
 #define WORK 400
 #define x first
 #define y second
-#define inf ((DataType)(1e9))
+#define inf ((int)(1e9))
 #define fastio() ios::sync_with_stdio(0);cin.tie(0);cout.tie(0)
 
 using namespace std;
 using ll=long long;
-using DataType=int;
-using pdd=pair<DataType,DataType>;
+using pii=pair<int,int>;
 
 struct Edge{
 	int dst;
-	DataType cap,cost;
+	int cap,cost;
 	int rev;
 };
 
 int dist[N];
 bool inq[N];
-pdd prv[N];
+pii prv[N];
 vector<Edge> v[N];
 
 bool bfs(){
@@ -52,8 +51,8 @@ bool bfs(){
 	return prv[T].x!=-1;
 }
 
-DataType dfs(int now,DataType& flow){
-	DataType ret=0;
+int dfs(int now,int& flow){
+	int ret=0;
 	for(int i=T;i!=S;i=prv[i].x)flow=min(flow,v[prv[i].x][prv[i].y].cap);
 	for(int i=T;i!=S;i=prv[i].x){
 		ret+=flow*v[prv[i].x][prv[i].y].cost;
@@ -64,17 +63,17 @@ DataType dfs(int now,DataType& flow){
 }
 
 // add 'directed' edge
-void addEdge(int src,int dst,DataType cap,DataType cost){
+void addEdge(int src,int dst,int cap,int cost){
 	v[src].push_back({dst,cap,cost,(int)v[dst].size()});
 	v[dst].push_back({src,0,-cost,(int)v[src].size()-1});
 }
 
 void solve(){
-	DataType ans=0,tot=0;
+	int ans=0,tot=0;
 	while(bfs()){
 		while(1){
-			DataType flow=inf;
-			DataType ret=dfs(S,flow);
+			int flow=inf;
+			int ret=dfs(S,flow);
 			if(!flow)break;
 			tot+=flow,ans+=ret;
 		}
@@ -85,7 +84,7 @@ void solve(){
 int main(){
 	fastio();
 	int n,m,e,w;
-	DataType val;
+	int val;
 	cin>>n>>m;
 	for(int i=1;i<=n;++i)addEdge(S,i,1,0);
 	for(int i=1;i<=m;++i)addEdge(WORK+i,T,1,0);
