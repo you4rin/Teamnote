@@ -2,6 +2,7 @@
 // boj.kr/20149
 #include<iostream>
 #include<string>
+#include<tuple>
 #include<vector>
 #include<algorithm>
 #define fastio() ios::sync_with_stdio(0);cin.tie(0);cout.tie(0)
@@ -13,42 +14,27 @@ using ll=long long;
 using ld=long double;
 using pld=pair<ld,ld>;
 
+// annotation: code related to finding point of intersection
 struct point{
 	ll x,y;
 	bool operator==(point& other){return x==other.x&&y==other.y;}
-	bool operator<(point& other){
-		if(x==other.x)return y<other.y;
-		return x<other.x;
-	}
+	bool operator<(point& other){return tie(x,y)<tie(other.x,other.y);}
 };
-
 struct line{
 	point p1,p2;
-	bool operator<(line& other){
-		if(p1==other.p1)return p2<other.p2;
-		return p1<other.p1;
-	}
+	bool operator<(line& other){return tie(p1,p2)<tie(other.p1,other.p2);}
 };
-
-struct func{
-	ld a,b;
-};
-
-point src[2],dst[2];
+struct func{ld a,b;};
 pld intersect;
-
 int ccw(point p1,point p2,point p3){
 	ll det=(p2.x-p1.x)*(p3.y-p2.y)-(p3.x-p2.x)*(p2.y-p1.y);
 	return !det?0:(det>0?1:-1);
 }
-
 void find_point(func a,func b){
 	ld x=(a.b-b.b)/(b.a-a.a),y=a.a*x+a.b;
 	intersect={x,y};
 }
-
 bool cross(line a,line b){
-	// annotation: finding point of intersection
 	int r1,r2;
 	if(a.p2<a.p1)swap(a.p1,a.p2);
 	if(b.p2<b.p1)swap(b.p1,b.p2);
@@ -78,6 +64,8 @@ bool cross(line a,line b){
 	else find_point(c,d);
 	return 1;
 }
+
+point src[2],dst[2];
 
 int main(){
 	scanf("%lld %lld %lld %lld",&src[0].x,&src[0].y,&src[1].x,&src[1].y);
